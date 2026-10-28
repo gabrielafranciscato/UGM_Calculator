@@ -1,9 +1,16 @@
 import customtkinter as ctk
+from calculator import addition, subtraction, multiplication,division
 
 class CalculatorApp(ctk.CTk):
 
     def __init__(self):
         super().__init__()
+
+        #Calculator state
+
+        self.first_number = None
+        self.operator = None
+        self.current_input = ""
 
         #Window configuration
         self.title("UGM Calculator")
@@ -36,13 +43,16 @@ class CalculatorApp(ctk.CTk):
         self.title_label.pack(pady=(25,15))
 
         #Calculator display
-        self.display = ctk.CTkEntry(
+        self.display = ctk.CTkLabel(
             self.calculator_frame,
+            text="0",
             width=400,
             height=65,
             font=("Arial", 28),
-            justify = "right",
-            placeholder_text="0"
+            anchor="e",
+            fg_color= ("#F3F3F3", "#343638"),
+            corner_radius=8,
+            padx=15
         )
         self.display.pack(padx=20, pady=20)
 
@@ -70,7 +80,17 @@ class CalculatorApp(ctk.CTk):
                     text=button_text,
                     width=85,
                     height=55,
-                    font=("Arial", 20)
+                    font=("Arial", 20),
+                    command=(
+                        lambda value=button_text: self.on_number_click(value)
+                    ) if button_text in "0123456789." 
+                    else (
+                        (lambda value=button_text: self.on_operator_click(value))
+                        if button_text in "+-×÷"
+                        else self.on_equals_click
+                        if button_text == "="
+                        else None
+                    )
                 )
 
                 button.grid(
@@ -80,3 +100,66 @@ class CalculatorApp(ctk.CTk):
                     pady=5
                 )
 
+    def on_number_click(self,number):
+        # Prevent multiple decimal points
+        if number == "." and "." in self.current_input:
+            return
+
+        # Add zero before a leading decimal point
+        if number == "." and not self.current_input:
+            self.current_input = "0"
+
+        # Add the selected number
+        self.current_input += str(number)
+
+        # Update the display
+        self.display.configure(text=self.current_input)
+
+    def on_operator_click(self,operator):
+        #Check if the user entered a number
+        if not self.current_input:
+            return
+
+        #Save the first number
+        self.first_number = float(self.current_input)
+
+        #Save the selected operator
+        self.operator = operator
+
+        # Clear input for the second number
+        self.current_input =""
+
+        # Show the selected operator
+
+        self.display.configure(text=operator)
+
+    def on_equals_click(self):
+        #Check that both numbers and an operator exists
+        if self.first_number is None or not self.current_input or not self.operator:
+            return
+
+        second_number = float(self.current_input)
+
+        try:
+            if self.operator == "+":
+                result = addition(self.first_number, second_number)
+            elif self.operator == "-":
+                result = subtraction(self.first_number, second_number)
+            elif self.operator == "×":
+                result = multiplication(self.first_number, second_number)
+            elif self.operator == "÷":
+                result = division(self.first_number, second_number)
+            else:
+                return
+
+            # Display the result
+            self.current_input = str(result)
+            self.display.configure(text=self.current_input)
+
+        except ValueError as error:
+            self.display.configure(text=str(error))
+            self.current_input = ""
+
+        # Reset the operation
+        self.first_number = None
+        self.operator = None
