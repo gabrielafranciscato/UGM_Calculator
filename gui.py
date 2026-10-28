@@ -45,3 +45,38 @@ class CalculatorApp(ctk.CTk):
             placeholder_text="0"
         )
         self.display.pack(padx=20, pady=20)
+
+        # Caculator buttons frame
+        self.buttons_frame = ctk.CTkFrame(
+            self.calculator_frame,
+            fg_color="transparent"
+        )
+        self.buttons_frame.pack(padx=20, pady=15)
+
+        # Button layout
+        buttons = [
+            ["C", "⌫", "(", ")"],
+            ["7", "8", "9", "÷"],
+            ["4", "5", "6", "×"],
+            ["1", "2", "3", "-"],
+            ["0", ".", "=", "+"]
+        ]
+
+        # Create buttons
+        for row_index, row in enumerate(buttons):
+            for col_index, button_text in enumerate(row):
+                button = ctk.CTkButton(
+                    self.buttons_frame,
+                    text=button_text,
+                    width=85,
+                    height=55,
+                    font=("Arial", 20)
+                )
+
+                button.grid(
+                    row=row_index,
+                    column=col_index,
+                    padx=5,
+                    pady=5
+                )
+
