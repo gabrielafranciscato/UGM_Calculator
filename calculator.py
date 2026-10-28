@@ -10,8 +10,8 @@ def multiplication(num1, num2):
     return num1 * num2
 
 def division(num1, divisor):
-    try:
-        return num1 / divisor
-    except ZeroDivisionError:
-        return "Error: Division by zero is undefined."
+    if divisor == 0:
+        raise ValueError("Cannot divide by zero.")
+    return num1 / divisor
+    
 
