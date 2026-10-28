@@ -1,11 +1,16 @@
-import customtkinter as ctk
 
+import customtkinter as ctk
+from gui import CalculatorApp
+
+# Configure the application appearance
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
-app = ctk.CTk()
-app.title("UGM_Calculator")
-app.geometry("900x600")
-app.minsize(700, 500)
 
-app.mainloop()
+def main():
+    app = CalculatorApp()
+    app.mainloop()
+
+
+if __name__ == "__main__":
+    main()
