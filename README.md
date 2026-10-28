@@ -22,7 +22,7 @@ UGM_Calculator is a group project developed by Computing students. Our goal is t
 
 ## Project Structure
 ```text
-class-python-calculator/
+UGM_calculator/
 ├── main.py
 ├── calculator.py
 ├── gui.py
@@ -53,8 +53,8 @@ class-python-calculator/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/gabrielafranciscato/class-python-calculator.git
-cd class-python-calculator
+git clone https://github.com/gabrielafranciscato/UGM_Calculator.git
+cd UGM_Calculator
 ```
 
 ### 2. Create a Virtual Environment
