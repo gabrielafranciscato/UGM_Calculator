@@ -9,7 +9,6 @@ class CalculationRecord:
         self.timestamp: datetime = datetime.now()
 
     def to_dict(self) -> Dict[str, Any]:
-        """Converts the record into a dictionary format."""
         return {
             "expression": self.expression,
             "result": self.result,
