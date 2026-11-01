@@ -1,11 +1,32 @@
 import customtkinter as ctk
+from PIL import Image
+from pathlib import Path
 from calculator import addition, subtraction, multiplication,division
 from history import CalculationHistoryManager
+
+
+#UGM_Manchester colour palette
+
+COLORS = {
+    "primary": "#1D263B",
+    "operator": "#254F83",
+    "accent": "#16A6C9",
+    "background": "#F4F6FA",
+    "white": "#FFFFFF",
+    "text":"#1D263B",
+    "number": "#E8EDF4",
+    "action": "#DCE4EF",
+}
+
+
+
 
 class CalculatorApp(ctk.CTk):
 
     def __init__(self):
         super().__init__()
+
+        self.configure(fg_color=COLORS["background"])
 
         #Calculator state
 
@@ -30,7 +51,8 @@ class CalculatorApp(ctk.CTk):
         #calculator frame
         self.calculator_frame =ctk.CTkFrame(
             self,
-            corner_radius=15
+            corner_radius=15,
+            fg_color=COLORS["white"]
         )
         self.calculator_frame.grid(
             row=0,
@@ -40,27 +62,68 @@ class CalculatorApp(ctk.CTk):
             sticky="nsew"
         )
 
-        #Application title
-        self.title_label = ctk.CTkLabel(
-            self.calculator_frame,
-            text="UGM_Calculator",
-            font=("Arial",28, "bold")
+        # University crest
+        logo_path = (
+            Path(__file__).resolve().parent
+            / "assets"
+            / "images"
+            / "ugm-logo.png"
         )
-        self.title_label.pack(pady=(25,15))
+
+        logo_image = Image.open(logo_path)
+
+        logo_width = 45
+        logo_height = round(
+            logo_width * logo_image.height / logo_image.width
+        )
+
+        self.ugm_logo = ctk.CTkImage(
+            light_image=logo_image,
+            dark_image=logo_image,
+            size=(logo_width, logo_height)
+        )
+
+        # Application header
+        self.header_frame = ctk.CTkFrame(
+            self.calculator_frame,
+            fg_color="transparent"
+        )
+        self.header_frame.pack(pady=(20, 10))
+
+        # University crest
+        self.logo_label = ctk.CTkLabel(
+            self.header_frame,
+            image=self.ugm_logo,
+            text=""
+        )
+        self.logo_label.pack(side="left", padx=(0, 12))
+
+        # Application title
+        self.title_label = ctk.CTkLabel(
+        self.header_frame,
+        text="UGM Calculator",
+        font=("Arial", 28, "bold"),
+        text_color=COLORS["primary"]
+        )
+        self.title_label.pack(side="left")
 
         #Calculator display
         self.display = ctk.CTkLabel(
             self.calculator_frame,
             text="0",
-            width=400,
+            width=380,
             height=65,
             font=("Arial", 28),
             anchor="e",
-            fg_color= ("#F3F3F3", "#343638"),
-            corner_radius=8,
-            padx=15
+            fg_color=COLORS ["primary"],
+            text_color=COLORS["white"],
+            corner_radius=10,
+            padx=20
         )
-        self.display.pack(padx=20, pady=20)
+        self.display.pack(
+            padx=20, 
+            pady=(10,15)
+        )
 
         # Caculator buttons frame
         self.buttons_frame = ctk.CTkFrame(
@@ -81,12 +144,34 @@ class CalculatorApp(ctk.CTk):
         # Create buttons
         for row_index, row in enumerate(buttons):
             for col_index, button_text in enumerate(row):
+
+                # Choose button colours
+                if button_text == "=":
+                    button_color = COLORS["accent"]
+                    text_color = COLORS["white"]
+
+                elif button_text in ("+", "-", "×", "÷"):
+                    button_color = COLORS["operator"]
+                    text_color = COLORS["white"]
+
+                elif button_text in ("C", "⌫", "(", ")"):
+                    button_color = COLORS["action"]
+                    text_color = COLORS["text"]
+
+                else:
+                    button_color = COLORS["number"]
+                    text_color = COLORS["text"]
+
                 button = ctk.CTkButton(
                     self.buttons_frame,
                     text=button_text,
                     width=85,
                     height=55,
                     font=("Arial", 20),
+                    fg_color=button_color,
+                    text_color=text_color,
+                    hover_color=COLORS["accent"],
+                    corner_radius=10,
                     command=(
                         lambda value=button_text: self.on_number_click(value)
                     ) if button_text in "0123456789." 
@@ -113,7 +198,8 @@ class CalculatorApp(ctk.CTk):
         # History panel
         self.history_frame = ctk.CTkFrame (
         self,
-        corner_radius= 15    
+        corner_radius= 15,
+        fg_color=COLORS["white"]    
         )
 
         self.history_frame.grid(
@@ -128,7 +214,8 @@ class CalculatorApp(ctk.CTk):
         self.history_title = ctk.CTkLabel(
             self.history_frame,
             text="Calculation History",
-            font= ("Arial", 22, "bold")
+            font= ("Arial", 22, "bold"),
+            text_color=COLORS["primary"]
         )
 
         self.history_title.pack(pady=(20,10))
@@ -138,7 +225,9 @@ class CalculatorApp(ctk.CTk):
         self.history_list = ctk.CTkScrollableFrame(
             self.history_frame,
             width=250,
-            height=350
+            height=350,
+            fg_color=COLORS["background"],
+            corner_radius=10
         )
 
         self.history_list.pack(
@@ -262,6 +351,7 @@ class CalculatorApp(ctk.CTk):
                 self.history_list,
                 text=f"{expression}={result}",
                 font=("Arial",15),
+                text_color=COLORS["text"],
                 anchor="w",
                 wraplength=230
             )
