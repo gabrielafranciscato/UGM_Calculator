@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from calculator import addition, subtraction, multiplication,division
+from history import CalculationHistoryManager
 
 class CalculatorApp(ctk.CTk):
 
@@ -11,6 +12,9 @@ class CalculatorApp(ctk.CTk):
         self.first_number = None
         self.operator = None
         self.current_input = ""
+
+        # Initialize History Manager (Separate from GUI logic)
+        self.history_manager = CalculationHistoryManager()
 
         #Window configuration
         self.title("UGM Calculator")
@@ -89,6 +93,10 @@ class CalculatorApp(ctk.CTk):
                         if button_text in "+-×÷"
                         else self.on_equals_click
                         if button_text == "="
+                        else self.on_clear_click
+                        if button_text == "C"
+                        else self.on_backspace_click
+                        if button_text == "⌫"
                         else None
                     )
                 )
@@ -130,7 +138,6 @@ class CalculatorApp(ctk.CTk):
         self.current_input =""
 
         # Show the selected operator
-
         self.display.configure(text=operator)
 
     def on_equals_click(self):
@@ -139,6 +146,7 @@ class CalculatorApp(ctk.CTk):
             return
 
         second_number = float(self.current_input)
+        expression = f"{self.first_number} {self.operator} {second_number}"
 
         try:
             if self.operator == "+":
@@ -152,6 +160,9 @@ class CalculatorApp(ctk.CTk):
             else:
                 return
 
+            # Record calculation in history manager (Chronological order + Validation)
+            self.history_manager.record_calculation(expression, result)
+
             # Display the result
             self.current_input = str(result)
             self.display.configure(text=self.current_input)
@@ -163,3 +174,17 @@ class CalculatorApp(ctk.CTk):
         # Reset the operation
         self.first_number = None
         self.operator = None
+
+    def on_clear_click(self):
+        
+        self.first_number = None
+        self.operator = None
+        self.current_input = ""
+        self.display.configure(text="0")
+
+    def on_backspace_click(self):
+        if self.current_input:
+            self.current_input = self.current_input[:-1]
+            # Update display or fallback to "0" if input is empty
+            display_text = self.current_input if self.current_input else "0"
+            self.display.configure(text=display_text)
