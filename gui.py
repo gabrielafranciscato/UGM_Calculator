@@ -18,12 +18,14 @@ class CalculatorApp(ctk.CTk):
 
         #Window configuration
         self.title("UGM Calculator")
-        self.geometry("900x600")
-        self.minsize (700,500)
+        self.geometry("1100x650")
+        self.minsize (1050,600)
 
         #Main layout
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0,weight=1)
+        self.grid_columnconfigure(0, weight=3)
+        self.grid_rowconfigure(0,weight=2)
+        self.grid_rowconfigure(0, weight=1)
+
 
         #calculator frame
         self.calculator_frame =ctk.CTkFrame(
@@ -108,6 +110,59 @@ class CalculatorApp(ctk.CTk):
                     pady=5
                 )
 
+        # History panel
+        self.history_frame = ctk.CTkFrame (
+        self,
+        corner_radius= 15    
+        )
+
+        self.history_frame.grid(
+            row=0,
+            column=1,
+            padx=(0,30),
+            pady=30,
+            sticky= "nsew"
+        )
+
+        #History title
+        self.history_title = ctk.CTkLabel(
+            self.history_frame,
+            text="Calculation History",
+            font= ("Arial", 22, "bold")
+        )
+
+        self.history_title.pack(pady=(20,10))
+
+        #scrollable history area
+
+        self.history_list = ctk.CTkScrollableFrame(
+            self.history_frame,
+            width=250,
+            height=350
+        )
+
+        self.history_list.pack(
+            fill="both",
+            expand=True,
+            padx=15,
+            pady=10
+        )
+
+        # Clear history button
+        self.clear_history_button = ctk.CTkButton(
+            self.history_frame,
+            text="Clear Hisoty",
+            width=180,
+            height=40,
+            font=("Arial",15),
+            command=self.on_clear_history_click
+        )
+
+        self.clear_history_button.pack(
+            padx=15,
+            pady=(5,20)
+        )
+
     def on_number_click(self,number):
         # Prevent multiple decimal points
         if number == "." and "." in self.current_input:
@@ -161,7 +216,8 @@ class CalculatorApp(ctk.CTk):
                 return
 
             # Record calculation in history manager (Chronological order + Validation)
-            self.history_manager.record_calculation(expression, result)
+            if self.history_manager.record_calculation(expression, result):
+                self.update_history_display()
 
             # Display the result
             self.current_input = str(result)
@@ -188,3 +244,37 @@ class CalculatorApp(ctk.CTk):
             # Update display or fallback to "0" if input is empty
             display_text = self.current_input if self.current_input else "0"
             self.display.configure(text=display_text)
+
+    def update_history_display(self):
+        #Remove existing history items
+        for widget in self.history_list.winfo_children():
+            widget.destroy()
+
+        #retrieve saved calculations 
+        history = self.history_manager.retrieve_history()
+
+        #Display newest calculations first
+        for record in reversed(history):
+            expression = record ["expression"]
+            result = record ["result"]
+
+            history_item=ctk.CTkLabel(
+                self.history_list,
+                text=f"{expression}={result}",
+                font=("Arial",15),
+                anchor="w",
+                wraplength=230
+            )
+
+            history_item.pack(
+                fill="x",
+                padx=10,
+                pady=5
+            )
+
+    def on_clear_history_click(self):
+        #Remove all saved calculations
+        self.history_manager.clear_history()
+
+        #Refresh the history panel
+        self.update_history_display()
