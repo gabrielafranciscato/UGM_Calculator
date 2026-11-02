@@ -253,6 +253,36 @@ class CalculatorApp(ctk.CTk):
             pady=(5,20)
         )
 
+        # Bind keyboard events to the window
+        self.bind("<Key>", self.handle_keypress)
+
+    # Map keyboard keys to calculator actions and ignore unsupported keys
+    def handle_keypress(self, event):
+        key = event.keysym
+        char = event.char
+
+        # Number keys and decimal point
+        if char in "0123456789.":
+            self.on_number_click(char)
+
+        # Arithmetic operators
+        elif char == "+":
+            self.on_operator_click("+")
+        elif char == "-":
+            self.on_operator_click("-")
+        elif char in ("*", "x", "X"):
+            self.on_operator_click("×")
+        elif char == "/":
+            self.on_operator_click("÷")
+
+        # Functional keys
+        elif key in ("Return", "KP_Enter"):
+            self.on_equals_click()
+        elif key == "BackSpace":
+            self.on_backspace_click()
+        elif key == "Escape":
+            self.on_clear_click()
+
     def on_number_click(self,number):
         # If a calculation just finished, typing a number starts a fresh input
         if self.just_calculated:
