@@ -33,6 +33,7 @@ class CalculatorApp(ctk.CTk):
         self.first_number = None
         self.operator = None
         self.current_input = ""
+        self.just_calculated = False
 
         # Initialize History Manager (Separate from GUI logic)
         self.history_manager = CalculationHistoryManager()
@@ -253,6 +254,11 @@ class CalculatorApp(ctk.CTk):
         )
 
     def on_number_click(self,number):
+        # If a calculation just finished, typing a number starts a fresh input
+        if self.just_calculated:
+            self.current_input = ""
+            self.just_calculated = False
+
         # Prevent multiple decimal points
         if number == "." and "." in self.current_input:
             return
@@ -268,6 +274,10 @@ class CalculatorApp(ctk.CTk):
         self.display.configure(text=self.current_input)
 
     def on_operator_click(self,operator):
+        # If we just calculated, clear the flag so the result is reused as first_number
+        if self.just_calculated:
+            self.just_calculated = False
+
         #Check if the user entered a number
         if not self.current_input:
             return
@@ -308,26 +318,30 @@ class CalculatorApp(ctk.CTk):
             if self.history_manager.record_calculation(expression, result):
                 self.update_history_display()
 
-            # Display the result
+            # Display the result and mark calculation as complete
             self.current_input = str(result)
             self.display.configure(text=self.current_input)
+            self.just_calculated = True
 
         except ValueError as error:
             self.display.configure(text=str(error))
             self.current_input = ""
+            self.just_calculated = False
 
         # Reset the operation
         self.first_number = None
         self.operator = None
 
     def on_clear_click(self):
-        
         self.first_number = None
         self.operator = None
         self.current_input = ""
+        self.just_calculated = False
         self.display.configure(text="0")
 
     def on_backspace_click(self):
+        if self.just_calculated:
+            return  # Prevent backspacing on the final result
         if self.current_input:
             self.current_input = self.current_input[:-1]
             # Update display or fallback to "0" if input is empty
