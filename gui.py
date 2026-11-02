@@ -240,7 +240,7 @@ class CalculatorApp(ctk.CTk):
         # Clear history button
         self.clear_history_button = ctk.CTkButton(
             self.history_frame,
-            text="Clear Hisoty",
+            text="Clear History",
             width=180,
             height=40,
             font=("Arial",15),
