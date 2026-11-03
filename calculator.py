@@ -27,3 +27,9 @@ def validate_numbers(num1, num2):
     ):
         raise ValueError("Please enter valid numbers.")
 
+"""Return value as text with at most one decimal place."""
+def format_result(value): 
+    rounded = round(value, 1)
+    if rounded == 0:              # avoids showing "-0.0"
+        rounded = 0.0
+    return f"{rounded:.1f}".rstrip("0").rstrip(".")

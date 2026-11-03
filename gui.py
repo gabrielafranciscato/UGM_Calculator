@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 from pathlib import Path
-from calculator import addition, subtraction, multiplication,division
+from calculator import addition, subtraction, multiplication,division, format_result
 from history import CalculationHistoryManager
 
 
@@ -308,9 +308,9 @@ class CalculatorApp(ctk.CTk):
             if self.history_manager.record_calculation(expression, result):
                 self.update_history_display()
 
-            # Display the result
+            # Display the result - precision internally but showing one decimal place
             self.current_input = str(result)
-            self.display.configure(text=self.current_input)
+            self.display.configure(text=format_result(result))
 
         except ValueError as error:
             self.display.configure(text=str(error))
@@ -349,7 +349,7 @@ class CalculatorApp(ctk.CTk):
 
             history_item=ctk.CTkLabel(
                 self.history_list,
-                text=f"{expression}={result}",
+                text=f"{expression}={format_result(result)}",
                 font=("Arial",15),
                 text_color=COLORS["text"],
                 anchor="w",
