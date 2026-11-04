@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 from pathlib import Path
-from calculator import addition, subtraction, multiplication,division
+from calculator import evaluate_expression
 from history import CalculationHistoryManager
 
 
@@ -185,6 +185,10 @@ class CalculatorApp(ctk.CTk):
                         if button_text == "C"
                         else self.on_backspace_click
                         if button_text == "⌫"
+                        else (
+                            lambda value=button_text: self.on_parenthesis_click(value)
+                        )
+                        if button_text in ("(", ")")
                         else None
                     )
                 )
@@ -275,6 +279,10 @@ class CalculatorApp(ctk.CTk):
         elif char == "/":
             self.on_operator_click("÷")
 
+        # Handle parentheses keyboard input
+        elif char in ("(", ")"):
+            self.on_parenthesis_click(char)
+
         # Functional keys
         elif key in ("Return", "KP_Enter"):
             self.on_equals_click()
@@ -283,6 +291,15 @@ class CalculatorApp(ctk.CTk):
         elif key == "Escape":
             self.on_clear_click()
 
+    # Add opening or closing parentheses to the current expression 
+    def on_parenthesis_click(self, parenthesis):
+        if self.just_calculated:
+            self.current_input=""
+            self.just_calculated= False
+
+        self.current_input += parenthesis
+        self.display.configure(text=self.current_input)       
+
     def on_number_click(self,number):
         # If a calculation just finished, typing a number starts a fresh input
         if self.just_calculated:
@@ -290,8 +307,16 @@ class CalculatorApp(ctk.CTk):
             self.just_calculated = False
 
         # Prevent multiple decimal points
-        if number == "." and "." in self.current_input:
-            return
+        if number == ".":
+            current_number = self.current_input
+
+            for operator in "+-×÷()":
+                current_number = current_number.replace(operator, " ")
+
+            current_number = current_number.split()[-1] if current_number.split() else ""
+
+            if "." in current_number:
+                return
 
         # Add zero before a leading decimal point
         if number == "." and not self.current_input:
@@ -303,52 +328,45 @@ class CalculatorApp(ctk.CTk):
         # Update the display
         self.display.configure(text=self.current_input)
 
-    def on_operator_click(self,operator):
-        # If we just calculated, clear the flag so the result is reused as first_number
-        if self.just_calculated:
-            self.just_calculated = False
-
-        #Check if the user entered a number
+        # Add arithmetic operators to the current expression
+    def on_operator_click(self, operator):
         if not self.current_input:
-            return
-
-        #Save the first number
-        self.first_number = float(self.current_input)
-
-        #Save the selected operator
-        self.operator = operator
-
-        # Clear input for the second number
-        self.current_input =""
-
-        # Show the selected operator
-        self.display.configure(text=operator)
-
-    def on_equals_click(self):
-        #Check that both numbers and an operator exists
-        if self.first_number is None or not self.current_input or not self.operator:
-            return
-
-        second_number = float(self.current_input)
-        expression = f"{self.first_number} {self.operator} {second_number}"
-
-        try:
-            if self.operator == "+":
-                result = addition(self.first_number, second_number)
-            elif self.operator == "-":
-                result = subtraction(self.first_number, second_number)
-            elif self.operator == "×":
-                result = multiplication(self.first_number, second_number)
-            elif self.operator == "÷":
-                result = division(self.first_number, second_number)
+            if operator == "-":
+                self.current_input = "-"
             else:
                 return
 
-            # Record calculation in history manager (Chronological order + Validation)
+        elif self.current_input[-1] in "+-×÷":
+            # Replace the previous operator
+            self.current_input = self.current_input[:-1] + operator
+
+        elif self.current_input[-1] == "(":
+            # Allow negative numbers inside parentheses
+            if operator != "-":
+                return
+            self.current_input += operator
+
+        else:
+            self.current_input += operator
+
+        self.just_calculated = False
+        self.display.configure(text=self.current_input)
+
+        # Evaluate the complete expression and save it to history
+    def on_equals_click(self):
+        if not self.current_input or self.just_calculated:
+            return
+
+        expression = self.current_input
+
+        try:
+            result = evaluate_expression(expression)
+
+            # Save calculation to history
             if self.history_manager.record_calculation(expression, result):
                 self.update_history_display()
 
-            # Display the result and mark calculation as complete
+            # Display result
             self.current_input = str(result)
             self.display.configure(text=self.current_input)
             self.just_calculated = True
@@ -357,10 +375,6 @@ class CalculatorApp(ctk.CTk):
             self.display.configure(text=str(error))
             self.current_input = ""
             self.just_calculated = False
-
-        # Reset the operation
-        self.first_number = None
-        self.operator = None
 
     def on_clear_click(self):
         self.first_number = None
