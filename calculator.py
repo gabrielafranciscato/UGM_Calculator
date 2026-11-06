@@ -78,3 +78,9 @@ def evaluate_expression(expression):
 
     except (SyntaxError, TypeError, OverflowError, RecursionError):
         raise ValueError("Invalid expression.") from None
+
+def format_result(value):
+    rounded = round(value, 1)
+    if rounded == 0:
+        rounded = 0.0
+    return f"{rounded:.1f}".rstrip("0").rstrip(".")    

@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from PIL import Image
 from pathlib import Path
-from calculator import evaluate_expression
+from calculator import evaluate_expression, format_result
 from history import CalculationHistoryManager
 
 
@@ -368,7 +368,7 @@ class CalculatorApp(ctk.CTk):
 
             # Display result
             self.current_input = str(result)
-            self.display.configure(text=self.current_input)
+            self.display.configure(text=format_result(result))
             self.just_calculated = True
 
         except ValueError as error:
@@ -407,7 +407,7 @@ class CalculatorApp(ctk.CTk):
 
             history_item=ctk.CTkLabel(
                 self.history_list,
-                text=f"{expression}={result}",
+                text=f"{expression}={format_result(result)}",
                 font=("Arial",15),
                 text_color=COLORS["text"],
                 anchor="w",
