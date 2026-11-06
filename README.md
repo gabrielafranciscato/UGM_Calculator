@@ -4,12 +4,27 @@
 ## About the Project
 UGM_Calculator is a group project developed by Computing students. Our goal is to build a simple, user-friendly calculator while learning Python, software development and teamwork.
 
+
 ## Project Features
+
 - Addition, subtraction, multiplication and division
-- Clear and backspace buttons
-- Error handling, including division by zero
-- Simple graphical user interface (GUI)
-- Calculation history 
+- Calculations with decimal and negative numbers
+- Parentheses for mathematical expressions
+- Result formatting to one decimal place, removing unnecessary trailing zeros
+- Clear (C) button to reset the current calculation
+- Backspace (⌫) button to remove the last character
+- Input validation and error handling, including division by zero
+- Calculation history to display previous calculations
+- Clear History functionality
+- User-friendly desktop graphical interface built with CustomTkinter
+
+
+## Application Screenshot
+
+The screenshot below shows the completed UGM Calculator desktop application.
+
+![UGM Calculator Desktop Application](docs/screenshots/calculator-screenshot.png)
+
 
 ## Technologies
 - **Python** — Main programming language
@@ -89,7 +104,13 @@ python -m pip install -r requirements.txt
 python main.py
 ```
 
-**Note:** The application is currently in its initial development stage. The main window is available, but the calculator features are still being developed.
+
+**Note:** The UGM Calculator is fully functional and can be launched by running `python main.py` after installing the required dependencies.
+
+The application opens a desktop window where users can perform calculations, use parentheses, view calculation history and clear previous entries.
+
+For detailed instructions on using the calculator, refer to the [User Guide](docs/user-guide.md).
+
 
 ## Team Collaboration
 
@@ -107,9 +128,15 @@ The Team Lead coordinates the project, reviews contributions and supports collab
 
 ## Project Status
 
-**In Development — Initial Desktop Application Setup**
+**Functional Application — Testing and Documentation**
 
-The initial Python and CustomTkinter environment has been configured. The next stage is to develop the calculator logic, graphical interface and automated tests.
+The UGM Calculator has a functional desktop graphical user interface built with Python and CustomTkinter.
+
+The application supports basic arithmetic operations, decimal and negative numbers, parentheses, calculation history, clear and backspace functions, and error handling.
+
+All 10 documented manual test cases have passed successfully.
+
+The project is currently undergoing final documentation review and preparation for the university demonstration.
 
 ## Project Purpose
 
