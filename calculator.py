@@ -1,3 +1,6 @@
+
+import ast
+
 # Arithmetic Operator Functions
 
 def addition(num1, num2):
@@ -27,9 +30,51 @@ def validate_numbers(num1, num2):
     ):
         raise ValueError("Please enter valid numbers.")
 
-"""Return value as text with at most one decimal place."""
-def format_result(value): 
-    rounded = round(value, 1)
-    if rounded == 0:              # avoids showing "-0.0"
-        rounded = 0.0
-    return f"{rounded:.1f}".rstrip("0").rstrip(".")
+
+# Evaluate mathematical expressions safely, including parentheses
+def evaluate_expression(expression):
+    operations = {
+        ast.Add: addition,
+        ast.Sub: subtraction,
+        ast.Mult: multiplication,
+        ast.Div: division,
+    }
+
+    def calculate(node):
+        if isinstance(node, ast.Expression):
+            return calculate(node.body)
+
+        if isinstance(node, ast.Constant):
+            if type(node.value) in (int, float):
+                return node.value
+            raise ValueError("Invalid number.")
+
+        if isinstance(node, ast.BinOp):
+            operation = operations.get(type(node.op))
+
+            if operation is None:
+                raise ValueError("Unsupported operator.")
+
+            left = calculate(node.left)
+            right = calculate(node.right)
+
+            return operation(left, right)
+
+        if isinstance(node, ast.UnaryOp):
+            value = calculate(node.operand)
+
+            if isinstance(node.op, ast.USub):
+                return -value
+
+            if isinstance(node.op, ast.UAdd):
+                return value
+
+        raise ValueError("Invalid expression.")
+
+    try:
+        expression = expression.replace("×", "*").replace("÷", "/")
+        tree = ast.parse(expression, mode="eval")
+        return calculate(tree)
+
+    except (SyntaxError, TypeError, OverflowError, RecursionError):
+        raise ValueError("Invalid expression.") from None
