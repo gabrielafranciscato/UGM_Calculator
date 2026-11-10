@@ -730,7 +730,7 @@ class CalculatorApp(ctk.CTk):
 
             history_item = ctk.CTkLabel(
                 self.history_list,
-                text=f"{expression}={result}",
+                text=f"{expression}={format_result(result)}",
                 font=("Arial", 15),
                 text_color=COLORS["text"],
                 anchor="w",
